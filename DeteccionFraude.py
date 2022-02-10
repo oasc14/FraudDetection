@@ -30,6 +30,8 @@ dataset['Contrato_con_Fraude']=dataset['Contrato_con_Fraude'].fillna(0)
 # droping the last raw 
 dataset = dataset.drop(dataset.index[30572])
 
+#dataset['Contrato_con_Fraude']=dataset['Contrato_con_Fraude'].replace('nan',0)
+
 # Changing Sucursal ord(s) = 83
 dataset['Sucursal'] = dataset['Sucursal'].str.replace('Sucursal','83')
 
@@ -63,7 +65,40 @@ dataset['Contrato_con_Fraude']=dataset['Contrato_con_Fraude'].astype(int)
 
 #-------------------Finish Data Wrangling-----------------------
 
+# Split data
+X = dataset.iloc[:, :-1].values
+Y = dataset.iloc[:,-1].values
 
+# Feature Scaling
+from sklearn.preprocessing import MinMaxScaler
+sc = MinMaxScaler(feature_range=(0,1))
+X = sc.fit_transform(X)
 
+# NAO Train
+from minisom import MiniSom 
+som = MiniSom(x=10,y=10,input_len=9, sigma=1.0, learning_rate=0.5)
+som.random_weights_init(X)
+som.train_random(data=X, num_iteration=4000)
 
+# Show the results
+from pylab import bone,pcolor,colorbar,plot,show
+bone()
+pcolor(som.distance_map())
+colorbar()
+markers=['o','s']
+colors=['r','b']
+for i,x in enumerate(X):
+    w = som.winner(x)
+    plot(w[0]+0.5,
+         w[1]+0.5,
+         markers[Y[i]],
+         markeredgecolor = colors[Y[i]],
+         markerfacecolor = 'None',
+         markersize = 10,
+         markeredgewidth = 2)
+show()
 
+# detecting fraud
+mapeos = som.win_map(X)
+fraud = np.concatenate((mapeos[(2,7)],mapeos[(3,3)],mapeos[(8,4)],mapeos[(2,1)]), axis=0)
+fraud = sc.inverse_transform(fraud)
