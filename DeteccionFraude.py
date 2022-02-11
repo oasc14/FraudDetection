@@ -4,9 +4,14 @@ Created on Wed Feb  9 00:42:32 2022
 
 @author: Oscar A Suarez Castillo
 
-the ord() function returns the unicode from a given character, example:
+----------------------------------------------
+This script use a Self Organized Map for a fraud detection
+----------------------------------------------
+
+*The ord() function returns the unicode from a given character, example: 
     ord(c)=99
-for this database i used this transform in the Sucursal, Territorio and
+
+*For this database i used this transform in the Sucursal, Territorio and
 Cliente for made a change in the values of the database from string to
 float. This change facilite the calculus.
 
